@@ -3987,7 +3987,7 @@ EOF
     [[ "$output" != *"/new/"* ]] || return 1
     [[ "$output" != *"/completed/"* ]] || return 1
     [[ "$output" != *"settings.dat"* ]] || return 1
-    [[ "$output" == *"Cleaned 1 stale Codex crash reports"* ]]
+    [[ "$output" == *"Codex crash reports · cleaned 1 report"* ]]
 }
 
 @test "clean_codex_crashpad_pending defers while Codex or its crash handler runs" {

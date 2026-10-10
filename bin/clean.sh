@@ -1424,7 +1424,7 @@ _safe_clean_impl() {
         if [[ "$DRY_RUN" == "true" ]]; then
             local size_display
             size_display=$(colorize_human_size "$size_human")
-            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} $description${NC} · ${count_note}${size_display} ${YELLOW}dry${NC}"
+            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} $description${NC} · ${YELLOW}would clean${NC} ${count_note}${size_display}"
         else
             local line_color
             line_color=$(cleanup_result_color_kb "$total_size_kb")
@@ -1484,7 +1484,7 @@ start_cleanup() {
         echo ""
 
         if [[ "$DRY_RUN" == "true" ]]; then
-            echo -e "${YELLOW}Dry Run Mode${NC}, Preview only, no deletions"
+            echo -e "${YELLOW}DRY RUN MODE${NC}, Preview only, no files will be removed"
             echo ""
         fi
         SYSTEM_CLEAN=false
@@ -1499,7 +1499,7 @@ start_cleanup() {
     fi
 
     if [[ "$DRY_RUN" == "true" ]]; then
-        echo -e "${YELLOW}Dry Run Mode${NC}, Preview only, no deletions"
+        echo -e "${YELLOW}DRY RUN MODE${NC}, Preview only, no files will be removed"
         echo ""
 
         prepare_clean_preview_file || {
@@ -1544,6 +1544,72 @@ start_cleanup() {
     fi
 }
 
+# Announce the active whitelist before cleanup starts. The dry-run preview
+# names the custom rules; fixed core defaults stay counted in the header line
+# and are listed in full with --debug or the whitelist menu.
+show_whitelist_summary() {
+    [[ ${#WHITELIST_PATTERNS[@]} -gt 0 ]] || return 0
+
+    local predefined_count=0
+    local custom_count=0
+    local -a custom_patterns=()
+
+    for pattern in "${WHITELIST_PATTERNS[@]}"; do
+        local is_predefined=false
+        # Hard safety entries are the most core protection Mole ships, so
+        # count them with the defaults. Attributing them to the user reads
+        # as "you added these" for rules nobody opted into.
+        for default in "${DEFAULT_WHITELIST_PATTERNS[@]}" "${SAFETY_WHITELIST_PATTERNS[@]}"; do
+            local expanded_default="${default/#\~/$HOME}"
+            if [[ "$pattern" == "$expanded_default" ]]; then
+                is_predefined=true
+                break
+            fi
+        done
+
+        if [[ "$is_predefined" == "true" ]]; then
+            predefined_count=$((predefined_count + 1))
+        else
+            custom_count=$((custom_count + 1))
+            custom_patterns+=("$pattern")
+        fi
+    done
+
+    if [[ $custom_count -eq 0 && $predefined_count -eq 0 ]]; then
+        return 0
+    fi
+
+    local summary=""
+    [[ $predefined_count -gt 0 ]] && summary+="$predefined_count core"
+    [[ $custom_count -gt 0 && $predefined_count -gt 0 ]] && summary+=" + "
+    [[ $custom_count -gt 0 ]] && summary+="$custom_count custom"
+    summary+=" patterns active"
+
+    echo -e "${BLUE}${ICON_SUCCESS}${NC} Whitelist: $summary"
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        # The preview lists the custom rules by name; the fixed core defaults
+        # only add noise, so they stay counted in the header line and show up
+        # in full with --debug or the whitelist menu.
+        if [[ "${MO_DEBUG:-}" == "1" ]]; then
+            for pattern in "${WHITELIST_PATTERNS[@]}"; do
+                [[ "$pattern" == "$FINDER_METADATA_SENTINEL" ]] && continue
+                echo -e "  ${GRAY}${ICON_SUBLIST}${NC} ${GRAY}${pattern}${NC}"
+            done
+        else
+            if [[ ${#custom_patterns[@]} -gt 0 ]]; then
+                for pattern in "${custom_patterns[@]}"; do
+                    [[ "$pattern" == "$FINDER_METADATA_SENTINEL" ]] && continue
+                    echo -e "  ${GRAY}${ICON_SUBLIST}${NC} ${GRAY}${pattern}${NC}"
+                done
+            fi
+            if [[ $predefined_count -gt 0 ]]; then
+                echo -e "  ${GRAY}${ICON_SUBLIST}${NC} ${GRAY}mo clean --whitelist lists the ${predefined_count} core defaults${NC}"
+            fi
+        fi
+    fi
+}
+
 perform_cleanup() {
     if [[ -n "$EXTERNAL_VOLUME_TARGET" ]]; then
         total_items=0
@@ -1559,7 +1625,7 @@ perform_cleanup() {
     if [[ -z "$EXTERNAL_VOLUME_TARGET" && "${MOLE_TEST_MODE:-0}" == "1" ]]; then
         test_mode_enabled=true
         if [[ "$DRY_RUN" == "true" ]]; then
-            echo -e "${YELLOW}Dry Run Mode${NC}, Preview only, no deletions"
+            echo -e "${YELLOW}DRY RUN MODE${NC}, Preview only, no files will be removed"
             echo ""
         fi
         echo -e "${GREEN}${ICON_LIST}${NC} User app cache"
@@ -1613,47 +1679,7 @@ perform_cleanup() {
         check_tcc_permissions
     fi
 
-    if [[ ${#WHITELIST_PATTERNS[@]} -gt 0 ]]; then
-        local predefined_count=0
-        local custom_count=0
-
-        for pattern in "${WHITELIST_PATTERNS[@]}"; do
-            local is_predefined=false
-            # Hard safety entries are the most core protection Mole ships, so
-            # count them with the defaults. Attributing them to the user reads
-            # as "you added these" for rules nobody opted into.
-            for default in "${DEFAULT_WHITELIST_PATTERNS[@]}" "${SAFETY_WHITELIST_PATTERNS[@]}"; do
-                local expanded_default="${default/#\~/$HOME}"
-                if [[ "$pattern" == "$expanded_default" ]]; then
-                    is_predefined=true
-                    break
-                fi
-            done
-
-            if [[ "$is_predefined" == "true" ]]; then
-                predefined_count=$((predefined_count + 1))
-            else
-                custom_count=$((custom_count + 1))
-            fi
-        done
-
-        if [[ $custom_count -gt 0 || $predefined_count -gt 0 ]]; then
-            local summary=""
-            [[ $predefined_count -gt 0 ]] && summary+="$predefined_count core"
-            [[ $custom_count -gt 0 && $predefined_count -gt 0 ]] && summary+=" + "
-            [[ $custom_count -gt 0 ]] && summary+="$custom_count custom"
-            summary+=" patterns active"
-
-            echo -e "${BLUE}${ICON_SUCCESS}${NC} Whitelist: $summary"
-
-            if [[ "$DRY_RUN" == "true" ]]; then
-                for pattern in "${WHITELIST_PATTERNS[@]}"; do
-                    [[ "$pattern" == "$FINDER_METADATA_SENTINEL" ]] && continue
-                    echo -e "  ${GRAY}${ICON_SUBLIST}${NC} ${GRAY}${pattern}${NC}"
-                done
-            fi
-        fi
-    fi
+    show_whitelist_summary
 
     if [[ -t 1 && "$DRY_RUN" != "true" ]]; then
         local fda_status=0

@@ -428,9 +428,9 @@ clean_project_caches
 EOF
     [ "$status" -eq 0 ]
     [[ "$output" == *"Python bytecode cache"* ]] || return 1
-    [[ "$output" == *"1 dirs"* ]] || return 1
+    [[ "$output" == *"would clean 1 dir"* ]] || return 1
 
-	rm -rf "$HOME/Projects"
+    rm -rf "$HOME/Projects"
 }
 
 @test "clean_python_bytecode_cache_group reuses its exact size at removal" {
@@ -523,7 +523,7 @@ cat "$EXPORT_LIST_FILE"
 printf '\nSKIPPED=%s\n' "$whitelist_skipped_count"
 EOF
     [ "$status" -eq 0 ]
-    [[ "$output" == *"1 dirs"* ]] || return 1
+    [[ "$output" == *"would clean 1 dir"* ]] || return 1
     [[ "$output" == *"1 skipped"* ]] || return 1
     [[ "$output" == *"EXPORT"* ]] || return 1
     [[ "$output" == *"$HOME/Projects/python-app/pkg/__pycache__"* ]] || return 1

@@ -880,7 +880,7 @@ EOF
         echo "$output"
         return 1
     }
-    [[ "$output" == *"Trash · would empty, 3 items"* ]]
+    [[ "$output" == *"Trash · would empty 3 items"* ]]
 }
 
 @test "clean_trash dry run stops when the final Trash validation times out" {
@@ -962,7 +962,7 @@ for scenario in 124:0 1:0 130:1 143:1; do
     DRY_RUN=true
     rc=0
     clean_trash > "$HOME/dry.out" || rc=$?
-    rows=$(grep -c 'would empty, 2 items' "$HOME/dry.out" || true)
+    rows=$(grep -c 'would empty 2 items' "$HOME/dry.out" || true)
     printf 'SCENARIO=%s RC=%s CANCEL=%s PARTIAL=%s ROWS=%s RECORDED=[%s]\n' \
         "$scenario" "$rc" "$MOLE_CLEAN_CANCEL_STATUS" "$MOLE_CLEAN_SIZING_TIMEOUTS" "$rows" \
         "$(sort "$HOME/recorded" | tr '\n' ',')"
@@ -1018,7 +1018,7 @@ EOF
     rm -rf "$case_home" # SAFE: test fixture under the temporary HOME
     [ "$status" -eq 0 ] || { echo "$output"; return 1; }
     [[ "$output" == *"PROBE_RC=1"* ]] || { echo "$output"; return 1; }
-    [[ "$output" == *"Trash · would empty, 2 items"* ]] || { echo "$output"; return 1; }
+    [[ "$output" == *"Trash · would empty 2 items"* ]] || { echo "$output"; return 1; }
     [[ "$output" == *"RC=0 CANCEL=0"* ]] || { echo "$output"; return 1; }
 }
 
@@ -1935,7 +1935,7 @@ EOF
 
     [ "$status" -eq 0 ]
     [[ "$output" == *"Handoff clipboard cache"* ]] || return 1
-    [[ "$output" == *"dry"* ]] || return 1
+    [[ "$output" == *"would clean"* ]] || return 1
     [[ "$output" == *"PASS"* ]] || return 1
 }
 

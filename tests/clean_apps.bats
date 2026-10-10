@@ -1129,8 +1129,8 @@ clean_orphaned_app_data
 EOF
 
     [ "$status" -eq 0 ] || return 1
-    [[ "$output" == *"Would clean 1 items, about 2.0MB"* ]] || return 1
-    [[ "$output" != *"Cleaned 1 items"* ]] || return 1
+    [[ "$output" == *"Orphaned app files · would clean 1 item, about 2.0MB"* ]] || return 1
+    [[ "$output" != *"Orphaned app files · cleaned"* ]] || return 1
     [ -d "$test_home/Library/Caches/com.test.orphan-dry-run" ] || return 1
 }
 
@@ -1555,7 +1555,7 @@ EOF
     [[ "$output" != *"launchctl-called"* ]] || return 1
     # Positive control: every other assertion here is true on empty output, so
     # without this the test cannot distinguish "dry-run behaved" from "nothing ran".
-    [[ "$output" == *"Orphaned services · "*" found dry"* ]]
+    [[ "$output" == *"Orphaned services · would clean "* ]]
 }
 
 @test "clean_orphaned_system_services reports an authorization timeout" {
@@ -2839,7 +2839,7 @@ cat "$EXPORT_LIST_FILE"
 EOF
 
     [ "$status" -eq 0 ]
-    [[ "$output" == *"found dry"* ]] || return 1
+    [[ "$output" == *"Orphaned services · would clean"* ]] || return 1
     [[ "$output" == *"com.example.exported.orphan.plist  # "* ]] || return 1
 }
 
@@ -3332,7 +3332,7 @@ clean_orphaned_system_services
 EOF
 
     [ "$status" -eq 0 ] || { echo "$output"; return 1; }
-    [[ "$output" == *"Orphaned services · "*" found dry"* ]] || { echo "$output"; return 1; }
+    [[ "$output" == *"Orphaned services · would clean "* ]] || { echo "$output"; return 1; }
     local order
     order=$(grep -v '^START:Scanning' "$order_log" | tr '\n' '|')
     # The per-candidate work runs under the "Checking" spinner, and the

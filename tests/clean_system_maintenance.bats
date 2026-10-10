@@ -1191,7 +1191,7 @@ EOF
     [[ "$output" != *"wimlib"* ]] || return 1
     [[ "$output" != *"Skipping"* ]] || return 1
     [[ "$output" != *"man4"* ]] || return 1
-    [[ "$output" != *"Homebrew · would cleanup"* ]] || return 1
+    [[ "$output" != *"Homebrew · would clean"* ]] || return 1
     [[ "$output" == *"Homebrew unused dependencies · python@3.14 · remove with"*"brew autoremove"* ]] || return 1
     [[ "$output" != *"Would autoremove"* ]] || return 1
     [[ "$output" == *"CALL:brew cleanup --prune=30 --dry-run"* ]] || return 1
@@ -1246,7 +1246,7 @@ EOF
     [[ "$output" != *"UNEXPECTED_AUTOREMOVE_PREVIEW"* ]] || return 1
     [[ "$output" != *"CALL:brew"* ]] || return 1
     [[ "$output" != *"Homebrew cleanup"* ]] || return 1
-    [[ "$output" != *"would cleanup"* ]]
+    [[ "$output" != *"would clean"* ]]
 }
 
 @test "clean_homebrew dry-run names the manual command when the cleanup preview times out" {

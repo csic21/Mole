@@ -89,7 +89,9 @@ show_brew_cleanup_preview() {
     if [[ -n "$freed" ]]; then
         echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Homebrew cleanup · would free ${freed}"
     else
-        echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Homebrew cleanup · ${#rows[@]} items"
+        local brew_item_label="items"
+        [[ ${#rows[@]} -eq 1 ]] && brew_item_label="item"
+        echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Homebrew cleanup · would clean ${#rows[@]} $brew_item_label"
     fi
     printf '    %s\n' "${rows[@]}"
 }
@@ -315,7 +317,7 @@ clean_homebrew() {
                     echo -e "  ${GRAY}${ICON_WARNING}${NC} Homebrew cleanup preview timed out · run ${GRAY}brew cleanup --dry-run${NC} manually"
                     note_activity
                 else
-                    echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Homebrew · would cleanup"
+                    echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Homebrew · would clean"
                     note_activity
                 fi
                 # Autoremove sits after the window check in the real run too.

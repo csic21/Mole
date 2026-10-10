@@ -1523,7 +1523,7 @@ EOF
 
     [ "$status" -eq 0 ]
     [[ "$output" == *"Xcode XCTestDevices test data"* ]] || return 1
-    [[ "$output" == *"dry"* ]] || return 1
+    [[ "$output" == *"would clean"* ]] || return 1
     [[ "$output" == *"STILL_EXISTS"* ]]
 }
 

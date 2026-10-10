@@ -162,7 +162,7 @@ Clean Your Mac
 
 ======================================================================
 Cleanup complete
-Tracked cleanup: 4.5GB | Items cleaned: 97 | Categories: 4
+Tracked cleanup: 4.5GB | Items cleaned: 97
 Free space: 223.5GB (+4.5GB)
 ======================================================================
 ```

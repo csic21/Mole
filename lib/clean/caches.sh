@@ -192,7 +192,7 @@ clean_service_worker_cache() {
                 echo -e "  ${line_color}${ICON_SUCCESS}${NC} $browser_name Service Worker${NC} · $(colorize_human_size "${cleaned_human}")"
             fi
         else
-            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} $browser_name Service Worker, would clean $(colorize_human_size "$cleaned_human"), ${protected_count} protected"
+            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} $browser_name Service Worker · would clean $(colorize_human_size "$cleaned_human"), ${protected_count} protected"
         fi
         note_activity
         if [[ "$spinner_was_running" == "true" ]]; then
@@ -957,10 +957,12 @@ clean_python_bytecode_cache_group() {
             done
         fi
 
+        local py_dir_item_label="dirs"
+        [[ $removed_count -eq 1 ]] && py_dir_item_label="dir"
         if [[ $skipped_count -gt 0 ]]; then
-            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Python bytecode cache · ${display_root}${NC} · ${YELLOW}${removed_count} dirs, $(colorize_human_size "$size_human") ${YELLOW}dry, ${skipped_count} skipped${NC}"
+            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Python bytecode cache · ${display_root}${NC} · ${YELLOW}would clean ${removed_count} ${py_dir_item_label}${NC}, $(colorize_human_size "$size_human")${YELLOW}, ${skipped_count} skipped${NC}"
         else
-            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Python bytecode cache · ${display_root}${NC} · ${YELLOW}${removed_count} dirs, $(colorize_human_size "$size_human") ${YELLOW}dry${NC}"
+            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Python bytecode cache · ${display_root}${NC} · ${YELLOW}would clean ${removed_count} ${py_dir_item_label}${NC}, $(colorize_human_size "$size_human")"
         fi
     else
         local line_color

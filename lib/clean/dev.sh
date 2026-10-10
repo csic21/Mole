@@ -1960,7 +1960,9 @@ clean_xcode_system_coresimulator_caches() {
         if [[ "$cleanable_count" -gt 0 ]]; then
             local total_size_human
             total_size_human=$(bytes_to_human "$((total_size_kb * 1024))")
-            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Xcode Simulator system cache · would remove ${cleanable_count} entries (${total_size_human})"
+            local entry_item_label="entries"
+            [[ $cleanable_count -eq 1 ]] && entry_item_label="entry"
+            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Xcode Simulator system cache · would remove ${cleanable_count} ${entry_item_label} (${total_size_human})"
             note_activity
         fi
         if [[ -n "$stop_reason" ]]; then
@@ -2239,7 +2241,9 @@ clean_xcode_device_support() {
                 done
                 if [[ "$dry_run_count" -gt 0 ]]; then
                     stale_size_human=$(bytes_to_human "$((stale_size_kb * 1024))")
-                    echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} ${display_name} · would remove ${dry_run_count} old versions (${stale_size_human}), keeping ${keep_count} most recent"
+                    local version_item_label="versions"
+                    [[ $dry_run_count -eq 1 ]] && version_item_label="version"
+                    echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} ${display_name} · would remove ${dry_run_count} old ${version_item_label} (${stale_size_human}), keeping ${keep_count} most recent"
                     note_activity
                 fi
                 if [[ -n "$dry_stop_reason" ]]; then
@@ -3917,7 +3921,9 @@ clean_dev_automation_browsers() {
 
     if [[ ${#leaked_processes[@]} -gt 0 ]]; then
         if [[ "$DRY_RUN" == "true" ]]; then
-            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Leaked automation browsers · would stop ${#leaked_processes[@]} processes ${YELLOW}dry${NC}"
+            local process_item_label="processes"
+            [[ ${#leaked_processes[@]} -eq 1 ]] && process_item_label="process"
+            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Leaked automation browsers · would stop ${#leaked_processes[@]} ${process_item_label}"
         else
             local stopped=0
             local -a term_processes=()
@@ -4774,10 +4780,12 @@ clean_codex_crashpad_pending() {
     if [[ $count -gt 0 ]]; then
         local cleaned_mb
         cleaned_mb=$(echo "$cleaned_kb" | awk '{printf "%.1f", $1/1024}' || echo "0.0")
+        local report_item_label="reports"
+        [[ $count -eq 1 ]] && report_item_label="report"
         if [[ "$dry_run_mode" == "true" ]]; then
-            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Would clean $count stale Codex crash reports older than ${MOLE_ORPHAN_AGE_DAYS}d, about ${cleaned_mb}MB"
+            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Codex crash reports · would clean $count $report_item_label older than ${MOLE_ORPHAN_AGE_DAYS}d, about ${cleaned_mb}MB"
         else
-            echo -e "  ${GREEN}${ICON_SUCCESS}${NC} Cleaned $count stale Codex crash reports older than ${MOLE_ORPHAN_AGE_DAYS}d, about ${cleaned_mb}MB"
+            echo -e "  ${GREEN}${ICON_SUCCESS}${NC} Codex crash reports · cleaned $count $report_item_label older than ${MOLE_ORPHAN_AGE_DAYS}d, about ${cleaned_mb}MB"
         fi
         note_activity
     fi

@@ -1752,7 +1752,7 @@ EOF
 
     [ "$status" -eq 0 ]
     [[ "$output" == *"NeatDM stale downloads"* ]] || return 1
-    [[ "$output" == *"1 items"* ]]
+    [[ "$output" == *"would clean 1 item"* ]]
 }
 
 @test "clean_neatdm_stale_segments skips recent segments" {

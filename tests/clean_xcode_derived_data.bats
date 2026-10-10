@@ -391,7 +391,7 @@ EOF
         echo "$output"
         return 1
     }
-    [[ "$output" == *"Xcode DerivedData · 1 project, 7168 bytes"* ]] || return 1
+    [[ "$output" == *"Xcode DerivedData · would clean 1 project, 7168 bytes"* ]] || return 1
     [[ "$output" != *"928768 bytes"* ]]
 }
 
@@ -460,5 +460,5 @@ EOF
     }
     [[ "$output" == *"DEFER:Xcode"* ]] || return 1
     [[ "$output" != *"UNEXPECTED_REGISTER"* ]] || return 1
-    [[ "$output" != *"Xcode DerivedData · 1 project"* ]]
+    [[ "$output" != *"Xcode DerivedData · would clean"* ]]
 }

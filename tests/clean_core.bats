@@ -806,7 +806,7 @@ EOF
     set_mock_sudo_uncached
     run_clean_dry_run
     [ "$status" -eq 0 ]
-    [[ "$output" == *"Dry Run Mode"* ]] || return 1
+    [[ "$output" == *"DRY RUN MODE"* ]] || return 1
     [[ "$output" == *"sudo -v && mo clean --dry-run"* ]] || return 1
     [[ "$output" != *"system preview included"* ]]
 }
@@ -819,8 +819,40 @@ EOF
         "$PROJECT_ROOT/mole" clean
 
     [ "$status" -eq 0 ] || return 1
-    [[ "$output" == *"Dry Run Mode"* ]] || return 1
+    [[ "$output" == *"DRY RUN MODE"* ]] || return 1
     [[ -f "$HOME/.Trash/env-dry-run-sentinel" ]]
+}
+
+@test "dry run lists custom whitelist rules by name and hides core defaults" {
+    run env HOME="$HOME" PROJECT_ROOT="$PROJECT_ROOT" /bin/bash --noprofile --norc << 'EOF'
+set -euo pipefail
+source "$PROJECT_ROOT/lib/core/common.sh"
+source "$PROJECT_ROOT/bin/clean.sh"
+
+# bin/clean.sh defines DRY_RUN=false at source time; set it after sourcing.
+DRY_RUN=true
+WHITELIST_PATTERNS=("$HOME/whitelist-custom-rule" "$HOME/Library/Caches/com.apple.FontRegistry*")
+
+plain="$(show_whitelist_summary)"
+[[ "$plain" == *"1 core + 1 custom patterns active"* ]] || exit 1
+[[ "$plain" == *"$HOME/whitelist-custom-rule"* ]] || exit 1
+[[ "$plain" == *"core defaults"* ]] || exit 1
+[[ "$plain" != *"com.apple.FontRegistry"* ]] || exit 1
+
+MO_DEBUG=1
+debug_out="$(show_whitelist_summary)"
+[[ "$debug_out" == *"com.apple.FontRegistry"* ]] || exit 1
+echo "WHITELIST_DISPLAY_OK"
+EOF
+
+    [ "$status" -eq 0 ] || {
+        echo "$output"
+        return 1
+    }
+    [[ "$output" == *"WHITELIST_DISPLAY_OK"* ]] || {
+        echo "$output"
+        return 1
+    }
 }
 
 @test "mo clean --dry-run does not probe sudo in test mode" {
@@ -1762,8 +1794,8 @@ _clean_mail_downloads
 EOF
 
     [ "$status" -eq 0 ]
-    [[ "$output" == *"Would clean 1 mail attachments"* ]] || return 1
-    [[ "$output" != *"Cleaned 1 mail attachments"* ]] || return 1
+    [[ "$output" == *"Mail attachments · would clean 1 attachment"* ]] || return 1
+    [[ "$output" != *"Mail attachments · cleaned"* ]] || return 1
     [ -f "$HOME/Library/Mail Downloads/old.pdf" ]
 }
 

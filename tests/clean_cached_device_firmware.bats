@@ -77,7 +77,7 @@ EOF
     [ "$status" -eq 0 ]
     [[ "$output" == *"Cached device firmware"* ]] || return 1
     [[ "$output" == *"3 files"* ]] || return 1
-    [[ "$output" == *"dry"* ]] || return 1
+    [[ "$output" == *"would clean"* ]] || return 1
     [[ "$output" == *"Files: 3 Items: 1"* ]]
 }
 
@@ -179,7 +179,7 @@ EOF
 
     [ "$status" -eq 0 ]
     [[ "$output" == *"Cached device firmware"* ]] || return 1
-    [[ "$output" == *"dry"* ]] || return 1
+    [[ "$output" == *"would clean"* ]] || return 1
     [[ "$output" == *"PRESERVED"* ]]
 }
 

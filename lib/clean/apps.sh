@@ -95,7 +95,9 @@ clean_ds_store_tree() {
         size_human=$(bytes_to_human "$total_bytes")
         local size_kb=$(((total_bytes + 1023) / 1024))
         if [[ "$DRY_RUN" == "true" ]]; then
-            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} $label${NC} · ${YELLOW}$file_count files, $size_human dry${NC}"
+            local file_item_label="files"
+            [[ $file_count -eq 1 ]] && file_item_label="file"
+            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} $label${NC} · ${YELLOW}would clean $file_count $file_item_label, $size_human${NC}"
         else
             local line_color
             line_color=$(cleanup_result_color_kb "$size_kb")
@@ -881,10 +883,12 @@ clean_orphaned_app_data() {
     stop_section_spinner
     if [[ $orphaned_count -gt 0 ]]; then
         local orphaned_mb=$(echo "$total_orphaned_kb" | awk '{printf "%.1f", $1/1024}')
+        local leftover_item_label="items"
+        [[ $orphaned_count -eq 1 ]] && leftover_item_label="item"
         if [[ "${DRY_RUN:-false}" == "true" ]]; then
-            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Would clean $orphaned_count items, about ${orphaned_mb}MB"
+            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Orphaned app files · would clean $orphaned_count $leftover_item_label, about ${orphaned_mb}MB"
         else
-            echo -e "  ${GREEN}${ICON_SUCCESS}${NC} Cleaned $orphaned_count items, about ${orphaned_mb}MB"
+            echo -e "  ${GREEN}${ICON_SUCCESS}${NC} Orphaned app files · cleaned $orphaned_count $leftover_item_label, about ${orphaned_mb}MB"
         fi
         note_activity
     fi
@@ -1874,7 +1878,9 @@ clean_orphaned_system_services() {
         stop_section_spinner
 
         if [[ "${DRY_RUN:-false}" == "true" ]]; then
-            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Orphaned services · ${YELLOW}${orphaned_count} found dry${NC}"
+            local service_item_label="items"
+            [[ $orphaned_count -eq 1 ]] && service_item_label="item"
+            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Orphaned services · ${YELLOW}would clean ${orphaned_count} ${service_item_label}${NC}"
             note_activity
         elif [[ $removed_count -gt 0 ]]; then
             local orphaned_kb_display
@@ -2107,7 +2113,9 @@ clean_orphaned_container_stubs() {
     stop_section_spinner
     if [[ $removed_count -gt 0 ]]; then
         if [[ "$DRY_RUN" == "true" ]]; then
-            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Orphaned app container stubs, ${YELLOW}${removed_count} stubs dry${NC}"
+            local stub_item_label="stubs"
+            [[ $removed_count -eq 1 ]] && stub_item_label="stub"
+            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Orphaned app container stubs · ${YELLOW}would clean ${removed_count} ${stub_item_label}${NC}"
         else
             echo -e "  ${GREEN}${ICON_SUCCESS}${NC} Orphaned app container stubs, ${GREEN}${removed_count} removed${NC}"
             note_activity

@@ -108,7 +108,9 @@ clean_trash() {
                 preview_count=$((preview_count + 1))
             done < <(command find "$HOME/.Trash" -mindepth 1 -maxdepth 1 -print0 2> /dev/null || true)
             if [[ $preview_count -gt 0 ]]; then
-                echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Trash · would empty, $preview_count items"
+                local trash_item_label="items"
+                [[ $preview_count -eq 1 ]] && trash_item_label="item"
+                echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Trash · would empty $preview_count $trash_item_label"
                 note_activity
             fi
         fi
@@ -511,10 +513,12 @@ _clean_mail_downloads() {
     if [[ $count -gt 0 ]]; then
         local cleaned_mb
         cleaned_mb=$(echo "$cleaned_kb" | awk '{printf "%.1f", $1/1024}' || echo "0.0")
+        local mail_item_label="attachments"
+        [[ $count -eq 1 ]] && mail_item_label="attachment"
         if [[ "$dry_run_mode" == "true" ]]; then
-            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Would clean $count mail attachments older than ${mail_age_days}d, about ${cleaned_mb}MB"
+            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Mail attachments · would clean $count $mail_item_label older than ${mail_age_days}d, about ${cleaned_mb}MB"
         else
-            echo -e "  ${GREEN}${ICON_SUCCESS}${NC} Cleaned $count mail attachments older than ${mail_age_days}d, about ${cleaned_mb}MB"
+            echo -e "  ${GREEN}${ICON_SUCCESS}${NC} Mail attachments · cleaned $count $mail_item_label older than ${mail_age_days}d, about ${cleaned_mb}MB"
         fi
         note_activity
     fi
@@ -682,8 +686,10 @@ _clean_chromium_old_versions() {
     if [[ "$cleaned_any" == "true" ]]; then
         local size_human
         size_human=$(bytes_to_human "$((total_size * 1024))")
+        local dir_item_label="dirs"
+        [[ $cleaned_count -eq 1 ]] && dir_item_label="dir"
         if [[ "$DRY_RUN" == "true" ]]; then
-            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} ${label} old versions${NC} · ${YELLOW}${cleaned_count} dirs, $(colorize_human_size "$size_human") ${YELLOW}dry${NC}"
+            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} ${label} old versions${NC} · ${YELLOW}would clean ${cleaned_count} ${dir_item_label}${NC}, $(colorize_human_size "$size_human")"
         else
             local line_color
             line_color=$(cleanup_result_color_kb "$total_size")
@@ -943,8 +949,10 @@ clean_edge_updater_old_versions() {
     if [[ "$cleaned_any" == "true" ]]; then
         local size_human
         size_human=$(bytes_to_human "$((total_size * 1024))")
+        local dir_item_label="dirs"
+        [[ $cleaned_count -eq 1 ]] && dir_item_label="dir"
         if [[ "$DRY_RUN" == "true" ]]; then
-            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Edge updater old versions${NC} · ${YELLOW}${cleaned_count} dirs, $(colorize_human_size "$size_human") ${YELLOW}dry${NC}"
+            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Edge updater old versions${NC} · ${YELLOW}would clean ${cleaned_count} ${dir_item_label}${NC}, $(colorize_human_size "$size_human")"
         else
             local line_color
             line_color=$(cleanup_result_color_kb "$total_size")
@@ -1151,11 +1159,11 @@ clean_app_caches() {
     if [[ "$found_any" == "true" ]]; then
         if [[ "$DRY_RUN" == "true" ]]; then
             if [[ "$total_size_partial" == "true" ]]; then
-                echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Sandboxed app caches${NC} · ${YELLOW}dry${NC}"
+                echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Sandboxed app caches${NC} · ${YELLOW}would clean${NC}"
             else
                 local size_human
                 size_human=$(bytes_to_human "$((total_size * 1024))")
-                echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Sandboxed app caches${NC} · $(colorize_human_size "$size_human") ${YELLOW}dry${NC}"
+                echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Sandboxed app caches${NC} · ${YELLOW}would clean${NC} $(colorize_human_size "$size_human")"
             fi
         else
             if [[ "$total_size_partial" == "true" ]]; then
@@ -1223,7 +1231,7 @@ clean_handoff_pasteboard_cache() {
     local size_human
     size_human=$(bytes_to_human "$((total_kb * 1024))")
     if [[ "$DRY_RUN" == "true" ]]; then
-        echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Handoff clipboard cache${NC} · $(colorize_human_size "$size_human") ${YELLOW}dry${NC}"
+        echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Handoff clipboard cache${NC} · ${YELLOW}would clean${NC} $(colorize_human_size "$size_human")"
     else
         local line_color
         line_color=$(cleanup_result_color_kb "$total_kb")
@@ -1508,11 +1516,11 @@ clean_group_container_caches() {
     if [[ "$found_any" == "true" ]]; then
         if [[ "$DRY_RUN" == "true" ]]; then
             if [[ "$total_size_partial" == "true" ]]; then
-                echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Group Containers logs/caches${NC} · ${YELLOW}dry${NC}"
+                echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Group Containers logs/caches${NC} · ${YELLOW}would clean${NC}"
             else
                 local size_human
                 size_human=$(bytes_to_human "$((total_size * 1024))")
-                echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Group Containers logs/caches${NC} · $(colorize_human_size "$size_human") ${YELLOW}dry${NC}"
+                echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Group Containers logs/caches${NC} · ${YELLOW}would clean${NC} $(colorize_human_size "$size_human")"
             fi
         else
             if [[ "$total_size_partial" == "true" ]]; then
@@ -1788,7 +1796,7 @@ clean_external_volume_target() {
         local size_human
         size_human=$(bytes_to_human "$((total_size * 1024))")
         if [[ "$DRY_RUN" == "true" ]]; then
-            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} External volume cleanup${NC} · ${YELLOW}${volume_name}, $(colorize_human_size "$size_human") ${YELLOW}dry${NC}"
+            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} External volume cleanup${NC} · ${YELLOW}would clean ${volume_name}${NC}, $(colorize_human_size "$size_human")"
         else
             local line_color
             line_color=$(cleanup_result_color_kb "$total_size")
@@ -2592,9 +2600,9 @@ clean_application_support_logs() {
         local total_size_kb=$(((total_size_bytes + 1023) / 1024))
         if [[ "$DRY_RUN" == "true" ]]; then
             if [[ "$total_size_partial" == "true" ]]; then
-                echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Application Support logs/caches${NC} · ${YELLOW}at least $(colorize_human_size "$size_human") ${YELLOW}dry${NC}"
+                echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Application Support logs/caches${NC} · ${YELLOW}would clean${NC} at least $(colorize_human_size "$size_human")"
             else
-                echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Application Support logs/caches${NC} · $(colorize_human_size "$size_human") ${YELLOW}dry${NC}"
+                echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Application Support logs/caches${NC} · ${YELLOW}would clean${NC} $(colorize_human_size "$size_human")"
             fi
         else
             local line_color
@@ -2683,7 +2691,9 @@ clean_cached_device_firmware() {
         local size_human
         size_human=$(bytes_to_human "$((total_size_kb * 1024))")
         if [[ "$DRY_RUN" == "true" ]]; then
-            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Cached device firmware${NC} · ${YELLOW}${cleaned_count} files, $(colorize_human_size "$size_human") ${YELLOW}dry${NC}"
+            local file_item_label="files"
+            [[ $cleaned_count -eq 1 ]] && file_item_label="file"
+            echo -e "  ${YELLOW}${ICON_DRY_RUN}${NC} Cached device firmware${NC} · ${YELLOW}would clean ${cleaned_count} ${file_item_label}${NC}, $(colorize_human_size "$size_human")"
         else
             local line_color
             line_color=$(cleanup_result_color_kb "$total_size_kb")
@@ -3236,7 +3246,37 @@ _check_large_file_candidates_body() {
             done <<< "$docker_output"
             if [[ -n "$docker_detail" ]]; then
                 stop_section_spinner
-                echo -e "  ${YELLOW}${ICON_REVIEW}${NC} Docker storage · ${GRAY}${docker_detail}${NC}"
+                # docker system df passes through as one long line; trim it to
+                # the terminal so it cannot wrap. Piped logs keep the full text,
+                # and docker system df shows the complete numbers on demand.
+                local docker_detail_display="$docker_detail"
+                if [[ -t 1 ]]; then
+                    local docker_terminal_width="${COLUMNS:-}"
+                    if ! [[ "$docker_terminal_width" =~ ^[0-9]+$ ]] || [[ "$docker_terminal_width" -le 0 ]]; then
+                        docker_terminal_width=$(command tput cols 2> /dev/null || true)
+                    fi
+                    if ! [[ "$docker_terminal_width" =~ ^[0-9]+$ ]] || [[ "$docker_terminal_width" -le 0 ]]; then
+                        docker_terminal_width=80
+                    fi
+                    local docker_prefix_width
+                    docker_prefix_width=$(get_display_width "  ${ICON_REVIEW} Docker storage · ")
+                    local docker_available_width=$((docker_terminal_width - docker_prefix_width))
+                    [[ $docker_available_width -lt 16 ]] && docker_available_width=16
+                    # trim by measured display width; truncate_by_display_width
+                    # under-counts the available width on bash 3.2.
+                    local docker_trim_width
+                    docker_trim_width=$(get_display_width "$docker_detail_display")
+                    if [[ $docker_trim_width -gt $docker_available_width ]]; then
+                        local docker_target_width=$((docker_available_width - 3))
+                        [[ $docker_target_width -lt 8 ]] && docker_target_width=8
+                        while [[ $docker_trim_width -gt $docker_target_width ]]; do
+                            docker_detail_display="${docker_detail_display%?}"
+                            docker_trim_width=$(get_display_width "$docker_detail_display")
+                        done
+                        docker_detail_display+="..."
+                    fi
+                fi
+                echo -e "  ${YELLOW}${ICON_REVIEW}${NC} Docker storage · ${GRAY}${docker_detail_display}${NC}"
                 found_any=true
                 docker_reported=true
                 start_section_spinner "Scanning large files..."

@@ -227,7 +227,7 @@ EOF
 
     [ "$status" -eq 0 ]
     [[ "$output" == *"Chrome old versions"* ]] || return 1
-    [[ "$output" == *"dry"* ]] || return 1
+    [[ "$output" == *"would clean"* ]] || return 1
     [[ "$output" == *"Cleaned: 2 items"* ]]
 }
 
@@ -438,7 +438,7 @@ EOF
 
     [ "$status" -eq 0 ]
     [[ "$output" == *"Edge updater old versions"* ]] || return 1
-    [[ "$output" == *"dry"* ]] || return 1
+    [[ "$output" == *"would clean"* ]] || return 1
     [[ "$output" == *"Cleaned: 2 items"* ]]
 }
 
@@ -680,7 +680,7 @@ clean_chrome_old_versions
 EOF
 
     [ "$status" -eq 0 ]
-    [[ "$output" == *"dry"* ]] || return 1
+    [[ "$output" == *"would clean"* ]] || return 1
     # Verify marker file still exists (not deleted in dry run)
     [ -f "$VERSIONS_DIR/128.0.0.0/marker.txt" ]
 }
@@ -783,7 +783,7 @@ EOF
 
     [ "$status" -eq 0 ]
     [[ "$output" == *"Edge old versions"* ]] || return 1
-    [[ "$output" == *"dry"* ]] || return 1
+    [[ "$output" == *"would clean"* ]] || return 1
     [[ "$output" == *"Cleaned: 2 items"* ]]
 }
 

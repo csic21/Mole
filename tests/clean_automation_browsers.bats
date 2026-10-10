@@ -162,7 +162,7 @@ EOF
 
     run_cleanup true
     [ "$status" -eq 0 ] || { echo "$output"; return 1; }
-    [[ "$output" == *"would stop 1 processes"* ]] || { echo "$output"; return 1; }
+    [[ "$output" == *"would stop 1 process"* ]] || { echo "$output"; return 1; }
     [ ! -s "$HOME/kill.trace" ] || { cat "$HOME/kill.trace"; return 1; }
 }
 
